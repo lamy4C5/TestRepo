@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Second Verification - Email OTP</title>
+</head>
+<body>
+    <main>
+        <h1>Second Verification</h1>
+        <form action="{{ url_for('send_email') }}" method="post">
+            <p>Email: <input type="email" name="email" required></p>
+            <p>We have sent an email to the entered address with a One-Time Password (OTP).</p>
+            <p>OTP: <input type="text" name="otp" required></p>
+            <button type="submit">Confirm OTP</button>
+        </form>
+
+    </main>
+</body>
+</html>
