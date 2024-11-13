@@ -4,17 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Second Verification - Email OTP</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
     <main>
         <h1>Second Verification</h1>
-        <form action="{{ url_for('send_email') }}" method="post">
-            <p>Email: <input type="email" name="email" required></p>
-            <p>We have sent an email to the entered address with a One-Time Password (OTP).</p>
-            <p>OTP: <input type="text" name="otp" required></p>
-            <button type="submit">Confirm OTP</button>
+        <form action="{{ url_for('verify_otp') }}" method="post">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" value="{{ email }}" required>
+            </div>
+            <div class="form-group">
+                <label for="otp">OTP:</label>
+                <input type="text" id="otp" name="otp" required pattern="[0-9]{3}" maxlength="3">
+            </div>
+            <button type="submit">Verify OTP</button>
         </form>
-
+        {% if message %}
+        <p class="message">{{ message }}</p>
+        {% endif %}
     </main>
 </body>
 </html>

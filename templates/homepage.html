@@ -3,28 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>New Page Title</title>
+    <title>Homepage</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-
 </head>
-<main>
-    <h1>Welcome to the New Page</h1>
 <body>
-    <header>
-        <nav>
-            <ul>
-
-                <li><a href="{{ url_for('SignUp') }}">SignUp</a></li>
-                <li><a href="{{ url_for('Login') }}">LogIn</a></li>
-            </ul>
-        </nav>
-    </header>
-
-
+    <main>
+        <h1>Welcome</h1>
+        <div class="buttons">
+            <a href="{{ url_for('Login') }}"><button>Login</button></a>
+            <a href="{{ url_for('SignUp') }}"><button>Sign Up</button></a>
+        </div>
+        {% if message %}
+        <p class="message">{{ message }}</p>
+        {% endif %}
     </main>
-
-    <footer>
-        <p>© Website for MEC 2024 </p>
-    </footer>
 </body>
 </html>

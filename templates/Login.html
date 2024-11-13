@@ -4,15 +4,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
     <main>
         <h1>Login</h1>
-        <form action="/login" method="post">
-            <p>Username: <input type="text" name="username"></p>
-            <p>Password: <input type="password" name="password"></p>
-            <p><input type="submit" value="Enter"></p>
+        <form action="{{ url_for('LoginRequest') }}" method="post">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            <div class="form-group">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <button type="submit">Login</button>
         </form>
+        {% if message %}
+        <p class="message">{{ message }}</p>
+        <p>Don't have an account? <a href="{{ url_for('SignUp') }}" class="link">Sign Up</a></p>
+        {% endif %}
+        <div class="navigation-links">
+            <a href="{{ url_for('homepage') }}" class="back-link">Back to Homepage</a>
+        </div>
     </main>
 </body>
 </html>

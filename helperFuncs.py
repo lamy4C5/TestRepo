@@ -1,65 +1,78 @@
 import hashlib
-import smtplib
+import json
+import os
 
-DATABASE_NAME = "database.txt"
+DATABASE_FILE = 'database.json'
 
-def addUser(username,password,email):
-    file = open(DATABASE_NAME, "r")
-    retMsg  = ""
-    retBool = True
-    if not username.isalnum():
-        retMsg = "INVALID USERNAME, MUST BE ALPHANUMERIC"
-        retBool = False
-    elif not (password.isalnum() and len(password >= 3 and len(password <= 20))):
-        retMsg = "INVALID PASSWORD, MUST BE ALPHANUMERIC AND BETWEEN 3-20 CHARACTERS"
-        retBool = False
-    elif not (email.count("@") == 1 and email.split("@")[1].count(".") == 1):
-        retMsg = "INVALID EMAIL"
-        retBool = False
-
-    if retBool == False: #no need to loop through file if already invalid
-        return (retBool,retMsg)
-    
-    for line in file:
-        user = line.split(",")
-        if username.lower() == user[0].lower():
-            retMsg =  "USER HAS ALREADY SIGNED UP"
-            retBool = False
-        elif email.lower() == user[2].lower():
-            retMsg =  "EMAIL HAS ALREADY SIGNED UP"
-            retBool = False
-    file.close()
-    
-    
-    if retBool == True: #if the signup is still good
-        file = open(DATABASE_NAME,"w")
-        file.write(username+","+password+","+email)
-        retMsg =  "USER SIGNED UP SUCCESSFULLY"
-        file.close()
-    
-    return (retBool,retMsg)
-
-def queryLogin(username,encrypted_password):
-    file = open(DATABASE_NAME,"r")
-    retMsg = "USERNAME NOT FOUND"
-    retBool = False
-    for line in file:
-        curUserStuff = line.split(",")
-        #print(curUserStuff)
-        #print("ur:"+username+" "+"pw:"+encrypted_password)
-        if username == curUserStuff[0]:
-            if encrypted_password == curUserStuff[1]:
-                retMsg =  "LOGIN SUCCESSFUL"
-                retBool = True
-            else:
-                retMsg =  "INCORRECT PASSWORD"
-                retBool = False
-    file.close()
-    return (retBool,retMsg)
-        
 def hashText(text):
-    hashed_password = hashlib.sha256(text.encode()).hexdigest()
-    return hashed_password
+    """Hash the input text using SHA-256"""
+    return hashlib.sha256(text.encode()).hexdigest()
 
-def sendOTP(username):
-    pass #https://www.geeksforgeeks.org/send-mail-gmail-account-using-python/
+def load_database():
+    """Load the database from file"""
+    if os.path.exists(DATABASE_FILE):
+        with open(DATABASE_FILE, 'r') as f:
+            return json.load(f)
+    return {'users': {}}
+
+def save_database(db):
+    """Save the database to file"""
+    with open(DATABASE_FILE, 'w') as f:
+        json.dump(db, f, indent=4)
+
+def addUser(username, password, email):
+    """Add a new user to the database"""
+    # Load current database
+    db = load_database()
+    
+    # Check if username already exists
+    if username in db['users']:
+        return False, "Username already exists"
+    
+    # Check if email already exists
+    for user in db['users'].values():
+        if user['email'] == email:
+            return False, "Email already registered"
+    
+    # Add new user
+    db['users'][username] = {
+        'password': password,
+        'email': email
+    }
+    
+    # Save updated database
+    try:
+        save_database(db)
+        return True, "User registered successfully"
+    except Exception as e:
+        return False, f"Error saving user: {str(e)}"
+
+def queryLogin(username, password):
+    """Verify login credentials"""
+    db = load_database()
+    
+    if username not in db['users']:
+        return False, "Username not found"
+    
+    if db['users'][username]['password'] != password:
+        return False, "Incorrect password"
+    
+    return True, "Login successful"
+
+def getEmailFromUsername(username):
+    """Get email address for a username"""
+    db = load_database()
+    
+    if username in db['users']:
+        return db['users'][username]['email']
+    return None
+
+def sendOTP(otp, username):
+    """Store OTP for verification"""
+    db = load_database()
+    
+    if username in db['users']:
+        db['users'][username]['otp'] = otp
+        save_database(db)
+        return True
+    return False

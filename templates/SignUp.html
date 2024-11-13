@@ -3,28 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SignUp</title>
-    
+    <title>Sign Up</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
-
-    <h2>Signup Form</h2>
-    <form action="/SignUpRequest/" method="POST">
-        <div class="container">
-            <p>Username: <input type="text" name="username" required /></p>
+    <main>
+        <h1>Sign Up</h1>
+        <form action="{{ url_for('SignUpRequest') }}" method="post">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            <div class="form-group">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$">
+            </div>
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <button type="submit">Sign Up</button>
+        </form>
+        {% if message %}
+        <p class="message">{{ message }}</p>
+        {% endif %}
+        <div class="navigation-links">
+            <a href="{{ url_for('Login') }}" class="link">Already have an account? Login</a>
+            <a href="{{ url_for('homepage') }}" class="back-link">Back to Homepage</a>
         </div>
-
-        <div class="container">
-            <p>Email: <input type="email" name="email" required /></p>
-        </div>
-
-        <div class="container">
-            <p>Password: <input type="password" name="password" required /></p>
-        </div>
-
-        <button type="submit">Sign up</button>
-    </form>
-    <h2>{{message}}</h2>
-    <button> <a href="{{ url_for('homepage')}}">Back to Homepage</a></button>
+    </main>
 </body>
 </html>
